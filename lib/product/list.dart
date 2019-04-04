@@ -79,7 +79,7 @@ class ProductListState extends State<ProductList> {
             trailing: GestureDetector(
               child: Icon(Icons.delete, color: Colors.grey),
               onTap: () {
-                _delete(context, this.productList[position])
+                _delete(context, this.productList[position]);
               },
             ),
 

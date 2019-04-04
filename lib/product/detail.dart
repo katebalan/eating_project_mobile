@@ -53,7 +53,6 @@ class ProductDetailState extends State<ProductDetail> {
           child: ListView(
             children: <Widget>[
 
-
               Padding(
                 padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                 child: TextField(
