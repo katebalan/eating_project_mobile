@@ -1,4 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:eating_project_app/models/product.dart';
+import 'package:eating_project_app/utils/database_helper.dart';
+import 'package:eating_project_app/product/detail.dart';
+import 'package:sqflite/sqflite.dart';
 
 class ProductList extends StatefulWidget {
 
@@ -11,10 +16,17 @@ class ProductList extends StatefulWidget {
 
 class ProductListState extends State<ProductList> {
 
+  DatabaseHelper databaseHelper = DatabaseHelper();
+  List<Product> productList;
   int count = 0;
 
   @override
   Widget build(BuildContext context) {
+
+    if (productList == null) {
+      productList = List<Product>();
+      updateListView();
+    }
 
     return Scaffold(
 
@@ -28,6 +40,7 @@ class ProductListState extends State<ProductList> {
 
         onPressed: () {
           debugPrint("add button was tabbed");
+          navigateToProductDetail("New Product");
         },
 
         tooltip: 'Add Product',
@@ -55,22 +68,82 @@ class ProductListState extends State<ProductList> {
           child: ListTile(
 
             leading: CircleAvatar(
-              backgroundColor: Theme.of(context).primaryColor,
-              child: Icon(Icons.keyboard_arrow_right),
+              backgroundColor: getPriorityColor(this.productList[position].priority),
+              child: getPriorityIcon(this.productList[position].priority),
             ),
 
-            title: Text('Dummy title'),
+            title: Text(this.productList[position].title),
 
-            subtitle: Text('Dummy date'),
-            
-            trailing: Icon(Icons.delete, color: Colors.grey),
+            subtitle: Text(this.productList[position].date),
+
+            trailing: GestureDetector(
+              child: Icon(Icons.delete, color: Colors.grey),
+              onTap: () {
+                _delete(context, this.productList[position])
+              },
+            )
 
             onTap: () {
               debugPrint("onTap item");
+              navigateToProductDetail("Edit Product");
             },
           ),
         );
       },
     );
+  }
+
+
+  void navigateToProductDetail(String title) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return ProductDetail(title);
+    }));
+  }
+
+  Color getPriorityColor(int priority) {
+    switch (priority) {
+      case 1:
+        return Colors.red;
+        break;
+      case 2:
+        return Colors.yellow;
+        break;
+      default:
+        return Colors.yellow;
+    }
+  }
+
+  Icon getPriorityIcon(int priority) {
+    switch (priority) {
+      default:
+        return Icon(Icons.play_arrow);
+    }
+  }
+
+  void _delete(BuildContext context, Product product) async {
+    int result = await databaseHelper.deleteProduct(product.id);
+    if (result != 0) {
+      _showSnackBar(context, 'Note Deleted Successfully');
+      updateListView();
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(content: Text(message));
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
+
+  void updateListView() {
+    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    dbFuture.then((database) {
+
+      Future<List<Product>> productListFuture =  databaseHelper.getProductList();
+      productListFuture.then((productList) {
+        setState(() {
+          this.productList = productList;
+          this.count = productList.length;
+        });
+      });
+    });
   }
 }

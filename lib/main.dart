@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:eating_project_app/product/detail.dart';
 import 'package:eating_project_app/product/list.dart';
 
 void main() => runApp(new MyApp());
@@ -10,17 +9,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return new MaterialApp(
-      title: 'Startup Name Generator',
+      title: 'Product Keeper',
 
       theme: new ThemeData(
-        primaryColor: Colors.deepPurple,
-        primaryColorDark: Colors.deepPurple[600],
-        primaryColorLight: Colors.white,
+        primarySwatch: Colors.deepPurple,
       ),
 
-      home: new ProductDetail(),
+      home: new ProductList(),
     );
   }
 }
 
-// https://www.youtube.com/watch?v=iY2RYQKPm84
+// https://www.youtube.com/watch?v=xke5_yGL0uk
