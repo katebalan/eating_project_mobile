@@ -81,7 +81,7 @@ class ProductListState extends State<ProductList> {
               onTap: () {
                 _delete(context, this.productList[position])
               },
-            )
+            ),
 
             onTap: () {
               debugPrint("onTap item");
