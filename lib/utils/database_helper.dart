@@ -10,12 +10,27 @@ class DatabaseHelper {
   static DatabaseHelper _databaseHelper; // Singleton DatabaseHelper
   static Database _database;
 
-  String productTable = 'product';
+  // general colomns
   String colId = 'id';
+
+  String productTable = 'product';
   String colTitle = 'title';
   String colDescription = 'description';
   String colPriority = 'priority';
   String colDate = 'date';
+
+  String userTable = 'product';
+  String colName = 'name';
+  String colWeight = 'weight';
+  String colEnergyExchange = 'energy_exchange';
+  String colCurrentKkal = 'current_kkal';
+  String colCurrentFats = 'current_fats';
+  String colCurrentProteins = 'current_proteins';
+  String colCurrentCarbohydrates = 'current_carbohydrates';
+  String colNormalKkal = 'normal_kkal';
+  String colNormalFats = 'normal_fats';
+  String colNormalProteins = 'normal_proteins';
+  String colNormalCarbohydrates = 'normal_carbohydrates';
 
   DatabaseHelper._createInstance();
 
@@ -50,6 +65,19 @@ class DatabaseHelper {
 
     await db.execute('CREATE TABLE $productTable($colId INTEGER PRIMARY KEY AUTOINCREMENT,'
         ' $colTitle TEXT, $colDescription TEXT, $colPriority INTEGER, $colDate STRING) ');
+
+    await db.execute('CREATE TABLE $userTable('
+        '$colId INTEGER PRIMARY KEY AUTOINCREMENT,'
+        ' $colName TEXT,'
+        ' $colWeight INTEGER,'
+        ' $colCurrentKkal INTEGER,'
+        ' $colCurrentFats INTEGER,'
+        ' $colCurrentProteins INTEGER,'
+        ' $colCurrentCarbohydrates INTEGER,'
+        ' $colNormalKkal INTEGER'
+        ' $colNormalFats INTEGER,'
+        ' $colNormalProteins INTEGER,'
+        ' $colNormalCarbohydrates INTEGER) ');
   }
 
   // Fetch operation
