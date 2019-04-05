@@ -1,36 +1,42 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:eating_project_app/models/product.dart';
 import 'package:eating_project_app/utils/database_helper.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetail extends StatefulWidget {
 
-  String appBarTitle;
+  final String appBarTitle;
+  final Product product;
 
-  ProductDetail(this.appBarTitle);
+  ProductDetail(this.product, this.appBarTitle);
 
   @override
   State<StatefulWidget> createState() {
 
-    return ProductDetailState(this.appBarTitle);
+    return ProductDetailState(this.product, this.appBarTitle);
   }
 }
 
 class ProductDetailState extends State<ProductDetail> {
 
-  static var _priorities = ['Hight', 'Middle', 'Low'];
+  static var _priorities = ['High', 'Low'];
   String appBarTitle;
+  Product product;
+
+  DatabaseHelper helper = DatabaseHelper();
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  ProductDetailState(this.appBarTitle);
+  ProductDetailState(this.product, this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
 
     TextStyle textStyle = Theme.of(context).textTheme.title;
+
+    titleController.text = product.title;
+    descriptionController.text = product.description;
 
     return WillPopScope(
       onWillPop: () {
@@ -60,6 +66,7 @@ class ProductDetailState extends State<ProductDetail> {
                   style: textStyle,
                   onChanged: (value) {
                     debugPrint("Something is changed in Title Text Field");
+                    updateTitle();
                   },
                   decoration: InputDecoration(
                     labelStyle: textStyle,
@@ -79,6 +86,7 @@ class ProductDetailState extends State<ProductDetail> {
                   style: textStyle,
                   onChanged: (value) {
                     debugPrint("Something is changed in Description Text Field");
+                    updateDescription();
                   },
                   decoration: InputDecoration(
                       labelStyle: textStyle,
@@ -103,11 +111,12 @@ class ProductDetailState extends State<ProductDetail> {
 
                     style: textStyle,
 
-                    value: 'Low',
+                    value: getPriorityAsString(product.priority),
 
                     onChanged: (valueSelectedByUser) {
                       setState(() {
                         debugPrint("User selected $valueSelectedByUser");
+                        updatePriorityAsInt(valueSelectedByUser);
                       });
                     }
                 ),
@@ -130,6 +139,7 @@ class ProductDetailState extends State<ProductDetail> {
                         onPressed: () {
                           setState(() {
                             debugPrint('Save button is clicked');
+                            _save(context);
                           });
                         },
                       ),
@@ -148,6 +158,7 @@ class ProductDetailState extends State<ProductDetail> {
                         onPressed: () {
                           setState(() {
                             debugPrint('Delete button is clicked');
+                            _delete(context);
                           });
                         },
                       ),
@@ -165,6 +176,95 @@ class ProductDetailState extends State<ProductDetail> {
   }
 
   void moveToLastScreen() {
-    Navigator.pop(context);
+    Navigator.pop(context, true);
+  }
+
+  void updatePriorityAsInt(String value) {
+    switch (value) {
+      case 'High':
+        product.setPriority(1);
+        break;
+      case 'Low':
+        product.setPriority(2);
+        break;
+      default:
+        product.setPriority(2);
+    }
+  }
+
+  String getPriorityAsString(int value) {
+    String priority;
+    switch (value) {
+      case 1:
+        priority = _priorities[0];
+        break;
+      case 2:
+        priority = _priorities[1];
+        break;
+      default:
+        priority = _priorities[1];
+    }
+
+    return priority;
+  }
+
+  void updateTitle() {
+    product.setTitle(titleController.text);
+  }
+
+  void updateDescription() {
+    product.setDescription(descriptionController.text);
+  }
+
+  // Save data to database
+  void _save(BuildContext context) async {
+
+    moveToLastScreen();
+
+    product.setDate(DateFormat.yMMMd().format(DateTime.now()));
+    int result;
+    var id = product.id;
+    if (product.id != null) {
+      var id = product.id;
+      result = await helper.updateProduct(product);
+      debugPrint('$id result save function update: $result');
+    } else {
+      result = await helper.insertProduct(product);
+      debugPrint('$id result save function insert: $result');
+    }
+
+    if (result != 0) {
+      _showAlertDialog('Status', 'Product Saved Successfully');
+    } else {
+      _showAlertDialog('Status', 'Problem Saving Product');
+    }
+  }
+
+  void _showAlertDialog(String title, String message) {
+
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(title),
+      content: Text(message),
+    );
+
+    showDialog(context: context, builder: (_) => alertDialog);
+  }
+
+  void _delete(BuildContext context) async {
+
+    moveToLastScreen();
+
+    if (product.id == null) {
+      _showAlertDialog('Status', 'No  Product was deleted');
+      return;
+    }
+
+    int result = await helper.deleteProduct(product.id);
+
+    if (result != 0) {
+      _showAlertDialog('Status', 'Product Deleted Successfully');
+    } else {
+      _showAlertDialog('Status', 'Error Occured while Deleting Product');
+    }
   }
 }

@@ -40,7 +40,7 @@ class ProductListState extends State<ProductList> {
 
         onPressed: () {
           debugPrint("add button was tabbed");
-          navigateToProductDetail("New Product");
+          navigateToProductDetail(Product('', '', 2), "New Product");
         },
 
         tooltip: 'Add Product',
@@ -72,7 +72,7 @@ class ProductListState extends State<ProductList> {
               child: getPriorityIcon(this.productList[position].priority),
             ),
 
-            title: Text(this.productList[position].title),
+            title: Text(this.productList[position].title, style: titleStyle,),
 
             subtitle: Text(this.productList[position].date),
 
@@ -85,7 +85,8 @@ class ProductListState extends State<ProductList> {
 
             onTap: () {
               debugPrint("onTap item");
-              navigateToProductDetail("Edit Product");
+              debugPrint(this.productList[position].title);
+              navigateToProductDetail(this.productList[position], "Edit Product");
             },
           ),
         );
@@ -94,10 +95,14 @@ class ProductListState extends State<ProductList> {
   }
 
 
-  void navigateToProductDetail(String title) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return ProductDetail(title);
+  void navigateToProductDetail(Product product, String title) async {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return ProductDetail(product, title);
     }));
+
+    if (result == true) {
+      updateListView();
+    }
   }
 
   Color getPriorityColor(int priority) {
@@ -122,6 +127,7 @@ class ProductListState extends State<ProductList> {
 
   void _delete(BuildContext context, Product product) async {
     int result = await databaseHelper.deleteProduct(product.id);
+
     if (result != 0) {
       _showSnackBar(context, 'Note Deleted Successfully');
       updateListView();

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:eating_project_app/models/product.dart';
+import 'package:flutter/material.dart';
 
 class DatabaseHelper {
 
@@ -65,6 +66,7 @@ class DatabaseHelper {
   Future<int> insertProduct(Product product) async {
     Database db = await this.database;
     var result = await db.insert(productTable, product.toMap());
+    debugPrint('Result $result');
     return result;
   }
 
