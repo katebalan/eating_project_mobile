@@ -221,6 +221,10 @@ class ProductDetailState extends State<ProductDetail> {
 
     moveToLastScreen();
 
+    if (product.title.isEmpty) {
+      return;
+    }
+
     product.setDate(DateFormat.yMMMd().format(DateTime.now()));
     int result;
     var id = product.id;
