@@ -139,7 +139,7 @@ class ProductDetailState extends State<ProductDetail> {
                         onPressed: () {
                           setState(() {
                             debugPrint('Save button is clicked');
-                            _save(context);
+                            _save();
                           });
                         },
                       ),
@@ -158,7 +158,7 @@ class ProductDetailState extends State<ProductDetail> {
                         onPressed: () {
                           setState(() {
                             debugPrint('Delete button is clicked');
-                            _delete(context);
+                            _delete();
                           });
                         },
                       ),
@@ -217,7 +217,7 @@ class ProductDetailState extends State<ProductDetail> {
   }
 
   // Save data to database
-  void _save(BuildContext context) async {
+  void _save() async {
 
     moveToLastScreen();
 
@@ -254,7 +254,7 @@ class ProductDetailState extends State<ProductDetail> {
     showDialog(context: context, builder: (_) => alertDialog);
   }
 
-  void _delete(BuildContext context) async {
+  void _delete() async {
 
     moveToLastScreen();
 
